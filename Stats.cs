@@ -74,6 +74,11 @@ namespace Stats
 		
 		public void GameEventManagerOnNewGame(object sender, NewGameEventArgs newGameEventArgs)
 		{
+			DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
+			TimeSpan ts = DateTime.Now - baseTime;
+			long intervel = (long)ts.TotalSeconds;
+			StatsSettings.Instance.Newtime = intervel;
+			UpdateMainGuiStats();
 			_isNewgameing = true;
 		}
 
@@ -144,6 +149,13 @@ namespace Stats
                         Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'QuestsTextBox'.");
                         throw new Exception("The SettingsControl could not be created.");
                     }
+					
+					if (!Wpf.SetupTextBoxBinding(root, "NewtimeTextBox", "Newtime",
+                        BindingMode.TwoWay, StatsSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'NewtimeTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
 
 
                     // Your settings event handlers here.
@@ -206,6 +218,11 @@ namespace Stats
             //StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
 			//StatsSettings.Instance.Quests = 3 ;
             //UpdateMainGuiStats();
+			DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
+			TimeSpan ts = DateTime.Now - baseTime;
+			long intervel = (long)ts.TotalSeconds;
+			StatsSettings.Instance.Newtime = intervel;
+			//UpdateMainGuiStats();
             BotManager.Start();
         }
 
@@ -395,11 +412,6 @@ namespace Stats
 									DefaultBotSettings.Instance.ConstructedBasicDeck = @class;
 
 									foundQuest = true;
-									Log.InfoFormat("要求职业的任务：sleep 30.");
-									Thread.Sleep(30);
-									if( !_isNewgameing ){
-										continue;
-									}
 									break;
 								}
 								
