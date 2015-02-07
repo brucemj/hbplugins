@@ -34,6 +34,7 @@ namespace Stats
         private int _concedes;
         private int _quests;
 		private long _newtime;
+		private long _ticktime;
 
         /// <summary>Current stored wins.</summary>
         [DefaultValue(0)]
@@ -112,6 +113,22 @@ namespace Stats
                 }
                 _newtime = value;
                 NotifyPropertyChanged(() => Newtime);
+            }
+        }
+		
+		/// <summary>new game start time .</summary>
+        [DefaultValue(0)]
+        public long Ticktime
+        {
+            get { return _ticktime; }
+            set
+            {
+                if (value.Equals(_ticktime))
+                {
+                    return;
+                }
+                _ticktime = value;
+                NotifyPropertyChanged(() => Ticktime);
             }
         }
     }

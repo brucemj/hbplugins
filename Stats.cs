@@ -24,6 +24,7 @@ namespace Stats
         
         private bool _findNewQuest = true;
 		private bool _isNewgameing = false;
+		private int _numtick = 0;
 
 		//private var _rngDeck1 = TritonHs.BasicHeroTagClasses[2];
 		//private var _rngDeck2 = TritonHs.BasicHeroTagClasses[2];
@@ -156,6 +157,13 @@ namespace Stats
                         Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'NewtimeTextBox'.");
                         throw new Exception("The SettingsControl could not be created.");
                     }
+					
+					if (!Wpf.SetupTextBoxBinding(root, "TicktimeTextBox", "Ticktime",
+                        BindingMode.TwoWay, StatsSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'TicktimeTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
 
 
                     // Your settings event handlers here.
@@ -222,6 +230,8 @@ namespace Stats
 			TimeSpan ts = DateTime.Now - baseTime;
 			long intervel = (long)ts.TotalSeconds;
 			StatsSettings.Instance.Newtime = intervel;
+			StatsSettings.Instance.Ticktime = intervel;
+			
 			//UpdateMainGuiStats();
             BotManager.Start();
         }
@@ -379,6 +389,17 @@ namespace Stats
                     var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");
                     leftControl.Content = string.Format("Runtime: {0}", TritonHs.Runtime.Elapsed.ToString("h'h 'm'm 's's'"));
                 }));
+				if(_numtick >=2){
+					DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
+					TimeSpan ts = DateTime.Now - baseTime;
+					long intervel = (long)ts.TotalSeconds;
+					StatsSettings.Instance.Ticktime = intervel;
+					_numtick = 0 ;
+					UpdateMainGuiStats();
+				}else{
+					_numtick ++ ;
+				}
+				
             }
         }
         
