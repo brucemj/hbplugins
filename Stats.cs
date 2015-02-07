@@ -25,6 +25,7 @@ namespace Stats
         private bool _findNewQuest = true;
 		private bool _isNewgameing = false;
 		private int _numtick = 0;
+		private bool _tickstop = false;
 
 		//private var _rngDeck1 = TritonHs.BasicHeroTagClasses[2];
 		//private var _rngDeck2 = TritonHs.BasicHeroTagClasses[2];
@@ -71,6 +72,7 @@ namespace Stats
             GameEventManager.QuestUpdate += GameEventManagerOnQuestUpdate;
             GameEventManager.GameOver += GameEventManagerOnGameOver;
 			GameEventManager.NewGame += GameEventManagerOnNewGame ;
+			_tickstop = false ;
         }
 		
 		public void GameEventManagerOnNewGame(object sender, NewGameEventArgs newGameEventArgs)
@@ -92,12 +94,14 @@ namespace Stats
         public void Stop()
         {
             Log.DebugFormat("[Stats] Stop");
-
+			_tickstop = true ;
+			
             GameEventManager.StartingNewGame -= GameEventManagerOnStartingNewGame;
             GameEventManager.QuestUpdate -= GameEventManagerOnQuestUpdate;
             GameEventManager.GameOver -= GameEventManagerOnGameOver;
 			GameEventManager.NewGame -= GameEventManagerOnNewGame ;
 			_isNewgameing = false;
+			//TritonHs.OnGuiTick -= TritonHsOnOnGuiTick;
         }
 
         public JsonSettings Settings
@@ -389,18 +393,21 @@ namespace Stats
                     var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");
                     leftControl.Content = string.Format("Runtime: {0}", TritonHs.Runtime.Elapsed.ToString("h'h 'm'm 's's'"));
                 }));
-				if(_numtick >=2){
-					DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
-					TimeSpan ts = DateTime.Now - baseTime;
-					long intervel = (long)ts.TotalSeconds;
-					StatsSettings.Instance.Ticktime = intervel;
-					_numtick = 0 ;
-					UpdateMainGuiStats();
+				if(_tickstop){
+					Log.InfoFormat("The stats plugin is stop, Ticktime not update");
 				}else{
-					_numtick ++ ;
+					if(_numtick >=12){
+						DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
+						TimeSpan ts = DateTime.Now - baseTime;
+						long intervel = (long)ts.TotalSeconds;
+						StatsSettings.Instance.Ticktime = intervel;
+						_numtick = 0 ;
+						UpdateMainGuiStats();
+					}else{
+						_numtick ++ ;
+					}
 				}
-				
-            }
+            }	
         }
         
         private void GameEventManagerOnStartingNewGame(object sender, StartingNewGameEventArgs startingNewGameEventArgs)
