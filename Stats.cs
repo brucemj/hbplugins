@@ -244,16 +244,21 @@ namespace Stats
             //StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
 			//StatsSettings.Instance.Quests = 3 ;
             //UpdateMainGuiStats();
+			
+			DateTime dtDateTime = Convert.ToDateTime("1970-1-1 00:00:00");
+			dtDateTime = dtDateTime.AddSeconds( StatsSettings.Instance.Newtime ).ToLocalTime();
+			// 在新的一天，清0 DWins 和 DLosses
+			if( DateTime.Now.DayOfYear != dtDateTime.DayOfYear ){
+				StatsSettings.Instance.DWins = 0;
+				StatsSettings.Instance.DLosses = 0;
+			}
+			
 			DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
+			
 			TimeSpan ts = DateTime.Now - baseTime;
 			long intervel = (long)ts.TotalSeconds;
 			StatsSettings.Instance.Newtime = intervel;
 			StatsSettings.Instance.Ticktime = intervel;
-			
-			if(false){
-				StatsSettings.Instance.DWins = 0;
-				StatsSettings.Instance.DLosses = 0;
-			}
 			//UpdateMainGuiStats();
             BotManager.Start();
         }
