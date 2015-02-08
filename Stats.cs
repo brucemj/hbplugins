@@ -168,6 +168,20 @@ namespace Stats
                         Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'TicktimeTextBox'.");
                         throw new Exception("The SettingsControl could not be created.");
                     }
+					
+					if (!Wpf.SetupTextBoxBinding(root, "DWinsTextBox", "DWins",
+                        BindingMode.TwoWay, StatsSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DWinsTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
+					
+					if (!Wpf.SetupTextBoxBinding(root, "DLossesTextBox", "DLosses",
+                        BindingMode.TwoWay, StatsSettings.Instance))
+                    {
+                        Log.DebugFormat("[SettingsControl] SetupTextBoxBinding failed for 'DLossesTextBox'.");
+                        throw new Exception("The SettingsControl could not be created.");
+                    }
 
 
                     // Your settings event handlers here.
@@ -236,6 +250,10 @@ namespace Stats
 			StatsSettings.Instance.Newtime = intervel;
 			StatsSettings.Instance.Ticktime = intervel;
 			
+			if(false){
+				StatsSettings.Instance.DWins = 0;
+				StatsSettings.Instance.DLosses = 0;
+			}
 			//UpdateMainGuiStats();
             BotManager.Start();
         }
@@ -279,6 +297,7 @@ namespace Stats
             if (gameOverEventArgs.Result == GameOverFlag.Victory)
             {
                 StatsSettings.Instance.Wins++;
+                StatsSettings.Instance.DWins++;
                 UpdateMainGuiStats();
             }
             else if (gameOverEventArgs.Result == GameOverFlag.Defeat)
@@ -290,6 +309,7 @@ namespace Stats
                 else
                 {
                     StatsSettings.Instance.Losses++;
+                    StatsSettings.Instance.DLosses++;
                 }
                 UpdateMainGuiStats();
             }

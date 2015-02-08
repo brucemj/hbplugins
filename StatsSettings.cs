@@ -35,6 +35,8 @@ namespace Stats
         private int _quests;
 		private long _newtime;
 		private long _ticktime;
+		private int _dwins;
+		private int _dlosses;
 
         /// <summary>Current stored wins.</summary>
         [DefaultValue(0)]
@@ -131,5 +133,38 @@ namespace Stats
                 NotifyPropertyChanged(() => Ticktime);
             }
         }
+		
+		/// <summary>wins day .</summary>
+        [DefaultValue(0)]
+        public int DWins
+        {
+            get { return _dwins; }
+            set
+            {
+                if (value.Equals(_dwins))
+                {
+                    return;
+                }
+                _dwins = value;
+                NotifyPropertyChanged(() => DWins);
+            }
+        }
+		
+		/// <summary>losses day .</summary>
+        [DefaultValue(0)]
+        public int DLosses
+        {
+            get { return _dlosses; }
+            set
+            {
+                if (value.Equals(_dlosses))
+                {
+                    return;
+                }
+                _dlosses = value;
+                NotifyPropertyChanged(() => DLosses);
+            }
+        }
+		
     }
 }
