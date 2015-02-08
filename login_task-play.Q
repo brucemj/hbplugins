@@ -46,7 +46,7 @@ skill_delay(1) = delay_time2
 Dimenv main_hwnd, check_thread, err_hwnd,main_thread,timeout
 Dim g_appHwnd
 Global gamerun, timeout_thread, work_thread, monitor_thread, isout, reboot,g_username
-Global hbrun,act,title_hb
+Global hbrun,act,title_hb, logdir, gamelogfile, monitorlogfile
 //DimEnv reboot
 isout = 0
 work_thread = 0
@@ -54,6 +54,14 @@ monitor_thread = 0
 act = "play"
 hbrun = 0
 title_hb = "Hearthbuddy (0.3.828.115) [0.3.828.115]"
+setsystime
+Currentdate = year(Now) & "-" & Month(Now) & "-" & day(Now)
+Currenttime = Hour(Now) & "_" & Minute(Now) & "_" & Second(Now)
+logdir = "D:\wg\log\" & Currentdate
+gamelogfile = logdir & "\" &  Currenttime & "_game.txt"
+monitorlogfile = logdir & "\" & Currenttime & "_monitor.txt"
+
+WshShell.Run "cmd.exe /c md " + logdir, 0
 
 Rem startover  // 关闭所有存在的线程，重新开始游戏和监控线程
     If work_thread Then //关闭存在的工作线程
@@ -87,9 +95,8 @@ Rem startover  // 关闭所有存在的线程，重新开始游戏和监控线程
 
 
 Sub game_work
-	LogStart "D:/wg/game.log"
+	LogStart gamelogfile
 	TracePrint "game_work开始 ssssssssssssssssssssssssssssssssssssssssss"
-    setsystime
     start_time = now
     importdmdll 
     
@@ -123,7 +130,7 @@ End Function
 
 Sub game_monitor
     importdmdll2 
-    LogStart "D:/wg/monitor.log"
+    LogStart monitorlogfile
     Do
         Delay 30000//30秒循环一次
         TracePrint "game_monitor运行中... ... ...++++++++++++++++++++++++++++++++++++++++" & reboot
