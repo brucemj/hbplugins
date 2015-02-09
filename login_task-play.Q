@@ -46,46 +46,37 @@ skill_delay(1) = delay_time2
 Dimenv main_hwnd, check_thread, err_hwnd,main_thread,timeout
 Dim g_appHwnd
 Global gamerun, timeout_thread, work_thread, monitor_thread, isout, reboot,g_username
-Global hbrun,act,title_hb, logdir, gamelogfile, monitorlogfile
+Global hbrun,act,title_hb, logdir, gamelogfile, monitorlogfile, username, passwd
 //DimEnv reboot
 isout = 0
 work_thread = 0
 monitor_thread = 0
+timeout_thread = 0
+gamerun = 0
 act = "play"
 hbrun = 0
 title_hb = "Hearthbuddy (0.3.828.115) [0.3.828.115]"
 setsystime
+
+//userinfo = hb_Fgetuser("unlock", "70", "0")
+userinfo = hb_Fgetplayuser("play", "81", "0")
+
+username = userinfo(0)
+passwd = userinfo(1)
+g_username = username
+g_name = split(g_username, "@")
+
 Currentdate = year(Now) & "-" & Month(Now) & "-" & day(Now)
 Currenttime = Hour(Now) & "_" & Minute(Now) & "_" & Second(Now)
 logdir = "D:\wg\log\" & Currentdate
-gamelogfile = logdir & "\" &  Currenttime & "_game.txt"
-monitorlogfile = logdir & "\" & Currenttime & "_monitor.txt"
+gamelogfile = logdir & "\" & g_name(0) & "_" &  Currenttime & "_game.txt"
+monitorlogfile = logdir & "\" & g_name(0) & "_" & Currenttime & "_monitor.txt"
 
 Dim WshShell
 Set WshShell = CreateObject("wscript.Shell")
 WshShell.Run "cmd.exe /c md " + logdir, 0
 
-Rem startover  // 关闭所有存在的线程，重新开始游戏和监控线程
-    If work_thread Then //关闭存在的工作线程
-        TracePrint "关闭，work_thread 线程"
-        reboot = 1
-        StopThread work_thread : Delay 1000
-        work_thread = 0
-    End if
-//    If monitor_thread Then //关闭存在的监控线程
-//        TracePrint "关闭，monitor_thread 线程"
-//        StopThread monitor_thread : Delay 1000
-//        monitor_thread = 0
-//    End If 
-    If timeout_thread Then //关闭存在的超时计数线程
-        TracePrint "关闭，timeout_thread 线程"
-        StopThread timeout_thread : Delay 1000
-        timeout_thread = 0
-    End If
-    
-    reboot = 0 : gamerun = 0 : timeout_thread = 0 // 配置全局变量，监控线程会使用
-    
-    TracePrint "重新开启 线程"
+TracePrint "重新开启 线程 8888888888888888888888888888888888888"
     If work_thread=0 Then
         TracePrint "开启，work_thread 线程"
         work_thread = BeginThread(game_work)           : Delay 1000
@@ -134,7 +125,11 @@ Sub game_monitor
     importdmdll2 
     LogStart monitorlogfile
     Do
-        Delay 30000//30秒循环一次
+        If gamerun = 0 then // 如果游戏还没启动，则额外延时 120 秒
+            TracePrint "游戏还没启动，额外延时 120 秒，RestartScript--------------"
+            Delay 120000
+        End If
+        Delay 50000//50秒循环一次
         TracePrint "game_monitor运行中... ... ...++++++++++++++++++++++++++++++++++++++++" & reboot
         If reboot = 1 Then
             TracePrint "捕获到变量异常，RestartScript--------------"
@@ -280,13 +275,13 @@ TracePrint "检测进程id= "& 	check_thread
 		Case 1
 			TracePrint "游戏主窗口未找到"
 			StopThread check_thread
-			Goto startover
+			RestartScript
 		Case 2
 			TracePrint "游戏异常 oops!窗口弹出"
 		
 			StopThread check_thread
 			Call Plugin.Window.CloseEx(err_hwnd)
-			Goto startover
+			RestartScript
 
 	End Select
 	
@@ -735,7 +730,7 @@ Sub startfight(level)
 	
 	If (nextlevel > 6) Then 
 	 	hb_Fgetuser "unlock", "80", "0"
-		Goto startover
+		RestartScript
 		
 	Else 
 		selectgamescene (nextlevel)
@@ -2255,13 +2250,6 @@ ss = 100
 zw_loginexe = "D:\game\st_battle.cmd"
 
 ' 战网配置  C:\Users\Administrator.PC-20150117WNUD\AppData\Roaming\Battle.net\Battle.net.config
-//userinfo = hb_Fgetuser("unlock", "70", "0")
-userinfo = hb_Fgetplayuser("play", "81", "0")
-
-username = userinfo(0)
-passwd = userinfo(1)
-
-g_username = username
 
 Const title_login = "战网登录"
 Const title_protocol = "战网协议"
@@ -2772,6 +2760,7 @@ Sub hb_get_quest_st(num,user)
 		newtime_num = split(newtime_str(1), ",")
 		lasttime = Trim(newtime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
+        TracePrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "距离上次newgame时间 " & UnixTime - lasttime
 		If lasttime<>0 And (UnixTime - lasttime) > 900 Then 
 			TracePrint "距离上次newgame时间超过15分钟，重新启动"
 			RestartScript
@@ -2782,6 +2771,7 @@ Sub hb_get_quest_st(num,user)
 		ticktime_num = split(ticktime_str(1), ",")
 		tktime = Trim(ticktime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
+        TracePrint "ticktime时间 " & UnixTime - tktime
 		If tktime<>0 And UnixTime - tktime > 130 Then
 			TracePrint "ticktime时间超过2分钟，重新启动"
 			RestartScript
@@ -2854,7 +2844,7 @@ End Function
 ////////////////// pic_ ///////
 
 /*****************************************************/
-/* 过程名 异常画面，需要 goto startover
+/* 过程名 异常画面，需要 RestartScript
 /******************************************************/
 Sub pic_ex
 	if pic_dijing then //出现地精大战侏儒画面，已经解锁
