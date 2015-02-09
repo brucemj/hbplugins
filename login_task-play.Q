@@ -61,6 +61,8 @@ logdir = "D:\wg\log\" & Currentdate
 gamelogfile = logdir & "\" &  Currenttime & "_game.txt"
 monitorlogfile = logdir & "\" & Currenttime & "_monitor.txt"
 
+Dim WshShell
+Set WshShell = CreateObject("wscript.Shell")
 WshShell.Run "cmd.exe /c md " + logdir, 0
 
 Rem startover  // 关闭所有存在的线程，重新开始游戏和监控线程
