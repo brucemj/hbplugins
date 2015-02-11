@@ -173,7 +173,7 @@ hbwin = 1
         End If
         
 		
-		hb_wnd=dm.FindWindow("", "Hearthbuddy (0.3.828.115) [0.3.828.115]")
+		hb_wnd=dm.FindWindow("", title_hb)
 		
 		If hb_wnd > 0 Then 
 			hb_get_quest_st 5,g_username
