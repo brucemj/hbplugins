@@ -415,9 +415,9 @@ namespace Stats
 				if(!_isNewgameing && _isStartingNewGame)
 				{
 					_numStartingNewGame++ ;
-					if ( _numStartingNewGame >= 35)
+					if ( _numStartingNewGame >= 50)
 					{
-						Log.DebugFormat("StartingNewGame is hang 30s , so Unlock this Hero");
+						Log.DebugFormat("StartingNewGame is hang 50s , so Unlock this Hero");
 						_numStartingNewGame = 0 ;
 						_isUnlocking = true;
 						UnlockHeroConf();
