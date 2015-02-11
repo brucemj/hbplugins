@@ -11,7 +11,7 @@ EnableWindow=
 MacroID=e6e26432-4f37-40a4-ae8e-6fab1322bb38
 Description=login_task-play
 Enable=1
-AutoRun=0
+AutoRun=1
 [Repeat]
 Type=0
 Number=1
