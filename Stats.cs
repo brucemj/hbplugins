@@ -89,6 +89,7 @@ namespace Stats
 			UpdateMainGuiStats();
 			_isNewgameing = true;
 			_isStartingNewGame = false;
+			_numStartingNewGame = 0;
 			Log.DebugFormat("[Stats] GameEventManagerOnNewGame");
 		}
 
@@ -290,13 +291,19 @@ namespace Stats
         private void GameEventManagerOnGameOver(object sender, GameOverEventArgs gameOverEventArgs)
         {
 			_isNewgameing = false;
+			_isStartingNewGame = false;
+			NormalPlayConf();
+			if( _isUnlocking ){
+				StatsSettings.Instance.Concedes++;
+			}
             StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
             if (gameOverEventArgs.Result == GameOverFlag.Victory)
             {
-                StatsSettings.Instance.Wins++;
-                StatsSettings.Instance.DWins++;
+				if( !_isUnlocking ){
+					StatsSettings.Instance.Wins++;
+					StatsSettings.Instance.DWins++;
+				}
 				_isUnlocking = false;
-				NormalPlayConf();
                 UpdateMainGuiStats();
             }
             else if (gameOverEventArgs.Result == GameOverFlag.Defeat)
@@ -307,8 +314,10 @@ namespace Stats
                 }
                 else
                 {
-                    StatsSettings.Instance.Losses++;
-                    StatsSettings.Instance.DLosses++;
+					if(!_isUnlocking){
+						StatsSettings.Instance.Losses++;
+						StatsSettings.Instance.DLosses++;
+					}
                 }
                 UpdateMainGuiStats();
             }
