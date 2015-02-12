@@ -26,6 +26,10 @@ namespace Stats
 		private bool _isNewgameing = false;
 		private int _numtick = 0;
 		private bool _tickstop = false;
+        
+        private Triton.Game.Mapping.TAG_CLASS unlockDeck = TritonHs.BasicHeroTagClasses[1];
+        private bool _isUnlocking = false;
+        private int _numHung = 0;
 
 		//private var _rngDeck1 = TritonHs.BasicHeroTagClasses[2];
 		//private var _rngDeck2 = TritonHs.BasicHeroTagClasses[2];
@@ -83,6 +87,7 @@ namespace Stats
 			StatsSettings.Instance.Newtime = intervel;
 			UpdateMainGuiStats();
 			_isNewgameing = true;
+            _numHung = 0 ;
 		}
 
         /// <summary> The plugin tick callback. Do any update logic here. </summary>
@@ -229,20 +234,11 @@ namespace Stats
             _enabled = true;
             
             Log.DebugFormat("Hello this is custom Stats! --------");
-            DefaultBotSettings.Instance.GameMode = GameMode.Constructed	;
-            DefaultBotSettings.Instance.AutoGreet = false	;
-            DefaultBotSettings.Instance.ConstructedMode = ConstructedMode.Casual;  
-            DefaultBotSettings.Instance.ConstructedDeckType = DeckType.Basic;
-            // DefaultBotSettings.Instance.ConstructedCustomDeck = "123";
-            DefaultBotSettings.Instance.NeedsToCacheQuests = false;
-            DefaultBotSettings.Instance.NeedsToCacheCustomDecks = false;
-            //var rngDeck = TritonHs.BasicHeroTagClasses[Client.Random.Next(0, TritonHs.BasicHeroTagClasses.Length)];
-            var rngDeck = TritonHs.BasicHeroTagClasses[2];
-            // 0-DRUID; 1-HUNTER; 2-MAGE; 3-PALADIN; 4-PRIEST;
-            // 5-ROGUE; 6-SHAMAN; 7-WARLOCK; 8-WARRIOR; 
-            DefaultBotSettings.Instance.ConstructedBasicDeck = rngDeck;
-            //StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
-			//StatsSettings.Instance.Quests = 3 ;
+            
+            var decks = TritonHs.BasicHeroTagClasses;
+            // //Choose a random deck. We can add more logic for selection later...
+            var deck = decks[Client.Random.Next(0, decks.Length)];
+            NormalPlayConf(deck);
             //UpdateMainGuiStats();
 			
 			DateTime dtDateTime = Convert.ToDateTime("1970-1-1 00:00:00");
@@ -298,11 +294,23 @@ namespace Stats
         private void GameEventManagerOnGameOver(object sender, GameOverEventArgs gameOverEventArgs)
         {
 			_isNewgameing = false;
+            if( _isUnlocking ){
+				StatsSettings.Instance.Concedes++;
+			}
             StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
             if (gameOverEventArgs.Result == GameOverFlag.Victory)
             {
-                StatsSettings.Instance.Wins++;
-                StatsSettings.Instance.DWins++;
+                if( !_isUnlocking ){
+					StatsSettings.Instance.Wins++;
+					StatsSettings.Instance.DWins++;
+				}
+				_isUnlocking = false;
+                
+                var decks = TritonHs.BasicHeroTagClasses;
+                // //Choose a random deck. We can add more logic for selection later...
+                var deck = decks[Client.Random.Next(0, decks.Length)];
+                NormalPlayConf(deck);
+            
                 UpdateMainGuiStats();
             }
             else if (gameOverEventArgs.Result == GameOverFlag.Defeat)
@@ -313,8 +321,10 @@ namespace Stats
                 }
                 else
                 {
-                    StatsSettings.Instance.Losses++;
-                    StatsSettings.Instance.DLosses++;
+                    if(!_isUnlocking){
+						StatsSettings.Instance.Losses++;
+						StatsSettings.Instance.DLosses++;
+					}
                 }
                 UpdateMainGuiStats();
             }
@@ -325,6 +335,8 @@ namespace Stats
             StatsSettings.Instance.Wins = 0;
             StatsSettings.Instance.Losses = 0;
             StatsSettings.Instance.Concedes = 0;
+            StatsSettings.Instance.DWins = 0;
+            StatsSettings.Instance.DLosses = 0;
             UpdateMainGuiStats();
         }
 
@@ -418,10 +430,22 @@ namespace Stats
                     var leftControl = Wpf.FindControlByName<Label>(Application.Current.MainWindow, "StatusBarLeftLabel");
                     leftControl.Content = string.Format("Runtime: {0}", TritonHs.Runtime.Elapsed.ToString("h'h 'm'm 's's'"));
                 }));
+                if( !_tickstop && !_isNewgameing )
+				{
+					_numHung++ ;
+                    Log.DebugFormat("######### _numHung is {0} s #########", _numHung);
+					if ( _numHung >= 90)
+					{
+						Log.DebugFormat("StartingNewGame is hang 90s , so Unlock this Hero");
+						_numHung = 0 ;
+						_isUnlocking = true;
+						UnlockHeroConf();
+					}
+				}
 				if(_tickstop){
 					Log.InfoFormat("The stats plugin is stop, Ticktime not update");
 				}else{
-					if(_numtick >=12){
+					if(_numtick >=65){
 						DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
 						TimeSpan ts = DateTime.Now - baseTime;
 						long intervel = (long)ts.TotalSeconds;
@@ -439,6 +463,7 @@ namespace Stats
         {
             if (_findNewQuest)
             {
+                Log.DebugFormat("######### _findNewQuest #########");
                 var foundQuest = false;
                 var quests = TritonHs.CurrentQuests;
 				StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
@@ -446,6 +471,10 @@ namespace Stats
                 // Choose a basic deck to complete the quests.
                 foreach (var quest in quests)
                 {
+                    if( quest.Id == 31 ){  // 【步步高升: 将任意职业提升至10级。】 跳过该任务
+                        StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count - 1 ;
+                    }
+                    Log.DebugFormat("[Quest] 任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
                     // Loop through for each each class.
                     foreach (var @class in TritonHs.BasicHeroTagClasses)
                     {
@@ -454,51 +483,106 @@ namespace Stats
                         if (TritonHs.IsQuestForSpecificClass(quest.Id))
                         {
                             // If this quest is a win quest for this class.
-							
-								if (TritonHs.IsQuestForClass(quest.Id, @class))
-								{
-									Log.InfoFormat(
-										"[Quest] Now choosing the basic hero class to complete 要求职业的任务： [{0}] ,任务ID: [{1}] with.",
-										quest.Name, quest.Id);
+							if (TritonHs.IsQuestForClass(quest.Id, @class))
+							{
+								Log.DebugFormat(
+									"[Quest] Now choosing the basic hero class to complete 要求职业的任务： [{0}] ,任务ID: [{1}] with.",
+									quest.Name, quest.Id);
 
-									DefaultBotSettings.Instance.ConstructedDeckType = DeckType.Basic;
-									DefaultBotSettings.Instance.ConstructedBasicDeck = @class;
+                                NormalPlayConf(@class); ;
 
-									foundQuest = true;
-									break;
-								}
+								foundQuest = true;
+                                _findNewQuest = false;
+								break;
+							}
 								
                         }
                     }
 
                     // If we found a quest and changed bot settings, we're done.
-                    if (foundQuest)
+                    if (foundQuest){
+                        Log.DebugFormat("[Quest] 要求职业的任务已经配置.");
+                        _findNewQuest = false;
                         break;
+                    }
 
                     // Make sure we have a non-class quest to choose a random deck for.
                     if (!TritonHs.IsQuestForSpecificClass(quest.Id)) //不要求职业的任务
                     {
-                        // var decks = TritonHs.BasicHeroTagClasses;
+                        var decks = TritonHs.BasicHeroTagClasses;
 
                         // //Choose a random deck. We can add more logic for selection later...
-                        // var deck = decks[Client.Random.Next(0, decks.Length)];
+                        var deck = decks[Client.Random.Next(0, decks.Length)];
 
-                         Log.InfoFormat("[Quest] 预留功能，开发卡牌组,不要求职业的任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
-
+                        Log.DebugFormat("[Quest] 预留功能，开发卡牌组,不要求职业的任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
+                        
+                        NormalPlayConf(deck);
                         // DefaultBotSettings.Instance.ConstructedDeckType = DeckType.Basic;
                         // DefaultBotSettings.Instance.ConstructedBasicDeck = deck;
-
-                        // foundQuest = true;
-
+                        
+                        foundQuest = true;
+                        _findNewQuest = false;
                         break;
                     }
+                    // 特殊任务,随机英雄
+                    var pdecks = TritonHs.BasicHeroTagClasses;
+                    // //Choose a random deck. We can add more logic for selection later...
+                    var pdeck = pdecks[Client.Random.Next(0, pdecks.Length)];
+                    Log.DebugFormat("[Quest] 特殊任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
+                    NormalPlayConf(pdeck);
+                    _findNewQuest = false;
+                    break;
                 }
             }
         }
  
         private void GameEventManagerOnQuestUpdate(object sender, QuestUpdateEventArgs questUpdateEventArgs)
         {
+            Log.DebugFormat("######### QuestUpdate #########");
             _findNewQuest = true;
+        }
+    
+        private void NormalPlayConf(Triton.Game.Mapping.TAG_CLASS hero)
+        {
+            Log.DebugFormat("Use NormalPlayConf ......");
+            DefaultBotSettings.Instance.GameMode = GameMode.Constructed	;
+            DefaultBotSettings.Instance.AutoGreet = false	;
+            DefaultBotSettings.Instance.ConstructedMode = ConstructedMode.Casual;  
+            DefaultBotSettings.Instance.ConstructedDeckType = DeckType.Basic;
+            // DefaultBotSettings.Instance.ConstructedCustomDeck = "123";
+            DefaultBotSettings.Instance.NeedsToCacheQuests = false;
+            DefaultBotSettings.Instance.NeedsToCacheCustomDecks = false;
+            //var rngDeck = TritonHs.BasicHeroTagClasses[Client.Random.Next(0, TritonHs.BasicHeroTagClasses.Length)];
+            //var rngDeck = TritonHs.BasicHeroTagClasses[2];
+            // 0-DRUID; 1-HUNTER; 2-MAGE; 3-PALADIN; 4-PRIEST;
+            // 5-ROGUE; 6-SHAMAN; 7-WARLOCK; 8-WARRIOR;
+            unlockDeck = hero ;
+            DefaultBotSettings.Instance.ConstructedBasicDeck = unlockDeck;
+            //StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
+            //StatsSettings.Instance.Quests = 3 ;
+            //UpdateMainGuiStats();
+        }
+        
+        private void UnlockHeroConf()
+        {
+            Log.DebugFormat("Use UnlockHeroConf ......");
+            DefaultBotSettings.Instance.GameMode = GameMode.Practice	;
+            DefaultBotSettings.Instance.AutoGreet = false	;
+            DefaultBotSettings.Instance.NeedsToCacheQuests = false;
+            DefaultBotSettings.Instance.NeedsToCacheCustomDecks = false;
+            
+            DefaultBotSettings.Instance.PracticeDifficulty = PracticeDifficulty.Normal;
+            DefaultBotSettings.Instance.PracticeDeckType = DeckType.Basic;
+            
+            // 0-DRUID; 1-HUNTER; 2-MAGE; 3-PALADIN; 4-PRIEST;
+            // 5-ROGUE; 6-SHAMAN; 7-WARLOCK; 8-WARRIOR; 
+            
+            var rngDeck = TritonHs.BasicHeroTagClasses[2];
+            DefaultBotSettings.Instance.PracticeBasicDeck = rngDeck;
+            
+            //var opponent = TritonHs.BasicHeroTagClasses[8];
+            DefaultBotSettings.Instance.PracticeOpponentClass = unlockDeck;
         }
     }
 }
+
