@@ -2364,9 +2364,7 @@ Function hb_Finputlogin()' 输入账号密码，登录游戏
 		dm.SetWindowState login, 1
 		dm.Moveto 100, 155 : hb_LeftClick3 : Delay ss * 5  : dm.KeyPress 46 : Delay ss * 5 // 移动到用户名，点击3次，获取用户名焦点
 		dm.SetClipboard username : Delay ss * 5 // 用户名放置到系统剪切板
-		dm.RightClick  : Delay ss * 15
-		dm.Moveto 139,260 : hb_LeftClick3 : Delay ss * 5
-		//dm.KeyPress 80 : Delay ss * 5 // 右键，按P,复制
+		dm.RightClick  : Delay ss * 5 : dm.KeyPress 80 : Delay ss * 5 // 右键，按P,复制
 		TracePrint "右键P复制用户名" : dm.SetWindowState login, 1
 				
 		dm.KeyPress 9 : Delay ss * 5 // tab键移动到密码，获取密码焦点
@@ -2668,10 +2666,7 @@ Sub hb_set_profile(name,hwnd)
 	dm.SetClipboard profile(0) : Delay ss * 5// 用户名放置到系统剪切板
 	dm.Moveto 22, 44 : Delay ss * 10		
 	dm.LeftClick : Delay ss * 10
-	dm.RightClick  : Delay ss * 30
-    //dm.Moveto 82,68 : dm.LeftClick : Delay ss * 5 
-    dm.Moveto 74,87 : hb_LeftClick3 : Delay ss * 5 
-    //dm.KeyPress 80 : Delay ss * 5 // 右键，按P,复制
+	dm.RightClick  : Delay ss * 10 : dm.KeyPress 80 : Delay ss * 5 // 右键，按P,复制
 	TracePrint "右键 paste profile_name" 
 	
 	dm.SetWindowState hwnd, 1 : Delay ss * 10 : dm.KeyPress 13 //激活 hbcnf 窗口,并回车
