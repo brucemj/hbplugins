@@ -30,7 +30,7 @@ namespace Stats
 		private int _numtick = 0;
 		private int _numStartingNewGame = 0;
 		private bool _isUnlocking = false;
-		private Triton.Game.Mapping.TAG_CLASS unlockDeck = TritonHs.BasicHeroTagClasses[2];
+		private Triton.Game.Mapping.TAG_CLASS unlockDeck = TritonHs.BasicHeroTagClasses[1];
 
 		//private var _rngDeck1 = TritonHs.BasicHeroTagClasses[2];
 		//private var _rngDeck2 = TritonHs.BasicHeroTagClasses[2];
@@ -236,6 +236,7 @@ namespace Stats
             Log.DebugFormat("[Stats] Enable");
             _enabled = true;
             
+			_isUnlocking = false;
             Log.DebugFormat("Hello this is custom Stats! --------");
 			NormalPlayConf();
 			DateTime dtDateTime = Convert.ToDateTime("1970-1-1 00:00:00");
@@ -424,7 +425,7 @@ namespace Stats
 				if(!_isNewgameing && _isStartingNewGame)
 				{
 					_numStartingNewGame++ ;
-					if ( _numStartingNewGame >= 50)
+					if ( _numStartingNewGame >= 75)
 					{
 						Log.DebugFormat("StartingNewGame is hang 50s , so Unlock this Hero");
 						_numStartingNewGame = 0 ;
@@ -481,7 +482,7 @@ namespace Stats
             DefaultBotSettings.Instance.NeedsToCacheQuests = false;
             DefaultBotSettings.Instance.NeedsToCacheCustomDecks = false;
             //var rngDeck = TritonHs.BasicHeroTagClasses[Client.Random.Next(0, TritonHs.BasicHeroTagClasses.Length)];
-            var rngDeck = TritonHs.BasicHeroTagClasses[1];
+            var rngDeck = TritonHs.BasicHeroTagClasses[2];
             // 0-DRUID; 1-HUNTER; 2-MAGE; 3-PALADIN; 4-PRIEST;
             // 5-ROGUE; 6-SHAMAN; 7-WARLOCK; 8-WARRIOR; 
             DefaultBotSettings.Instance.ConstructedBasicDeck = rngDeck;
@@ -494,11 +495,7 @@ namespace Stats
         {
 			_isStartingNewGame = true;
 			Log.DebugFormat("GameEventManagerOnStartingNewGame");
-			if(_isUnlocking)
-			{
-				UnlockHeroConf();
-				return;
-			}
+
             if (!_isUnlocking && _findNewQuest)
             {
                 var foundQuest = false;
