@@ -445,7 +445,7 @@ namespace Stats
 				if(_tickstop){
 					Log.InfoFormat("The stats plugin is stop, Ticktime not update");
 				}else{
-					if(_numtick >=12){
+					if(_numtick >=65){
 						DateTime baseTime = Convert.ToDateTime("1970-1-1 8:00:00");
 						TimeSpan ts = DateTime.Now - baseTime;
 						long intervel = (long)ts.TotalSeconds;
