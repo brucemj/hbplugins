@@ -9,9 +9,9 @@ StopHotkeyMod=0
 RunOnce=1
 EnableWindow=
 MacroID=e6e26432-4f37-40a4-ae8e-6fab1322bb38
-Description=login_task-play
+Description=login_task-play_P
 Enable=1
-AutoRun=1
+AutoRun=0
 [Repeat]
 Type=0
 Number=1

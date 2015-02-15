@@ -70,7 +70,7 @@ g_name = split(g_username, "@")
 Currentdate = year(Now) & "-" & Month(Now) & "-" & day(Now)
 Currenttime = Hour(Now) & "_" & Minute(Now) & "_" & Second(Now)
 logdir = "D:\wg\log\" & Currentdate
-gamelogfile = logdir & "\" & g_name(0) & "_" &  Currenttime & "_game.txt"
+gamelogfile = "D:\wg\log\gamelogin.txt"
 monitorlogfile = logdir & "\" & g_name(0) & "_" & Currenttime & "_monitor.txt"
 
 Dim WshShell
@@ -94,12 +94,12 @@ Sub game_work
     start_time = now
     importdmdll 
     
-    logintime = BeginThread(count_to(140, "登录超时"))//开始游戏登录超时计数
+    logintime = BeginThread(count_to(160, "登录超时"))//开始游戏登录超时计数
     TracePrint logintime
     hsinitializemj
-    hb_intogame 
+    hb_intogame
+    TracePrint "登录超时160秒关闭 " : StopThread logintime//游戏登录成功，停止超时计数
     hb_hbstart
-    TracePrint "登录超时140秒关闭 " : StopThread logintime //游戏登录成功，停止超时计数
     gamerun = 1 : TracePrint "游戏登录成功------"
     
 //    timeout_thread = BeginThread(count_to(2230,"过关超时")) //开始游戏登录超时计数
@@ -2364,8 +2364,9 @@ Function hb_Finputlogin()' 输入账号密码，登录游戏
 		dm.SetWindowState login, 1
 		dm.Moveto 100, 155 : hb_LeftClick3 : Delay ss * 5  : dm.KeyPress 46 : Delay ss * 5 // 移动到用户名，点击3次，获取用户名焦点
 		dm.SetClipboard username : Delay ss * 5 // 用户名放置到系统剪切板
-		dm.RightClick  : Delay ss * 15
-		dm.Moveto 139,260 : hb_LeftClick3 : Delay ss * 5
+		dm.RightClick  : Delay ss * 35
+		//dm.Moveto 139,260 : hb_LeftClick3 : Delay ss * 15
+		dm.Moveto 153,227 : dm.LeftClick : Delay ss * 15
 		//dm.KeyPress 80 : Delay ss * 5 // 右键，按P,复制
 		TracePrint "右键P复制用户名" : dm.SetWindowState login, 1
 				
@@ -2768,8 +2769,8 @@ Sub hb_get_quest_st(num,user)
 		lasttime = Trim(newtime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
         TracePrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "距离上次newgame时间 " & UnixTime - lasttime
-		If lasttime<>0 And (UnixTime - lasttime) > 900 Then 
-			TracePrint "距离上次newgame时间超过15分钟，重新启动"
+		If lasttime<>0 And (UnixTime - lasttime) > 1200 Then 
+			TracePrint "距离上次newgame时间超过20分钟，重新启动"
 			RestartScript
 		End If
 	End If
@@ -2779,7 +2780,7 @@ Sub hb_get_quest_st(num,user)
 		tktime = Trim(ticktime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
         TracePrint "ticktime时间 " & UnixTime - tktime
-		If tktime<>0 And UnixTime - tktime > 130 Then
+		If tktime<>0 And UnixTime - tktime > 140 Then
 			TracePrint "ticktime时间超过2分钟，重新启动"
 			RestartScript
 		End If
@@ -2790,7 +2791,8 @@ Sub hb_get_quest_st(num,user)
 //		RestartScript  // 重新开始
 //	End If
 	If qt = condition_1 and dwin >= condition_2  Then 
-		hb_Fgetplayuser "play", "82", "0" // 换号
+		hb_Fgetplayuser "play", "82", "0"// 换号
+		TracePrint "换号条件满足，重新开始 "
 		RestartScript  // 重新开始
 	End If
 
