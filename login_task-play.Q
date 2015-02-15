@@ -46,7 +46,9 @@ skill_delay(1) = delay_time2
 Dimenv main_hwnd, check_thread, err_hwnd,main_thread,timeout
 Dim g_appHwnd
 Global gamerun, timeout_thread, work_thread, monitor_thread, isout, reboot,g_username
-Global hbrun,act,title_hb, logdir, gamelogfile, monitorlogfile, username, passwd
+Global hbrun, act, title_hb, logdir, gamelogfile, monitorlogfile, username, passwd
+
+Private Declare Function IsHungAppWindow Lib "user32.dll" ( ByVal hWnd As Long) As Long
 //DimEnv reboot
 isout = 0
 work_thread = 0
@@ -112,6 +114,26 @@ Sub game_work
     
 End Sub
 
+Sub checkfreezewin(hwnd)
+	i = 1
+	do		
+		Delay 1000
+		If IsHungAppWindow(hwnd)=0 Then 
+			i=0 //窗口正常，次数归零
+			TracePrint "checkfreezewin 窗口正常 "
+			Exit Do
+		Else 
+			TracePrint "checkfreezewin 窗口未响应"
+			i=i+1
+			If i = 30 Then //如果窗口未响应30次，
+				RestartScript
+			End If
+		End If
+	Loop
+	
+End Sub
+
+
 Function count_to(second, note)
 	isout = 1
 	CmdPrint "开启了超时线程：" & note & "--" & second & "秒" & now
@@ -151,10 +173,11 @@ Sub game_monitor
         End if
         oopwin = dm.FindWindow("", "Oops!")
         //secwin = dm.FindWindow("", "战网账号安全")
-hbwin = 1
+		hbwin = 1
         gamewin = 1
         If gamerun = 1 Then 
         	gamewin = dm.FindWindow("", "炉石传说")
+        	checkfreezewin gamewin
         End If
         If hbrun = 1 Then 
         	hbwin = dm.FindWindow("", title_hb)
@@ -180,6 +203,12 @@ hbwin = 1
 			hb_get_quest_st 5,g_username
 		Else 
 			CmdPrint "heartbuddy not lunched"
+		End If
+		
+		
+		gamefrozen = dm.FindWindow("","炉石传说 (未响应)")
+		If gamefrozen > 0 Then 
+			checkfreezewin gamefrozen
 		End If
 		
     Loop
