@@ -71,69 +71,70 @@ Currentdate = year(Now) & "-" & Month(Now) & "-" & day(Now)
 Currenttime = Hour(Now) & "_" & Minute(Now) & "_" & Second(Now)
 logdir = "D:\wg\log\" & Currentdate
 gamelogfile = "D:\wg\log\gamelogin.txt"
-monitorlogfile = logdir & "\" & g_name(0) & "_" & Currenttime & "_monitor.txt"
+monitorlogfile = logdir & "\" &  "game_monitor.txt"
 
 Dim WshShell
 Set WshShell = CreateObject("wscript.Shell")
 WshShell.Run "cmd.exe /c md " + logdir, 0
 
-TracePrint "ÖØĞÂ¿ªÆô Ïß³Ì 8888888888888888888888888888888888888"
+CmdPrint "ÖØĞÂ¿ªÆô Ïß³Ì 8888888888888888888888888888888888888"
     If work_thread=0 Then
-        TracePrint "¿ªÆô£¬work_thread Ïß³Ì"
+        CmdPrint "¿ªÆô£¬work_thread Ïß³Ì"
         work_thread = BeginThread(game_work)           : Delay 1000
     End if
     If monitor_thread=0 Then
-        TracePrint "¿ªÆô£¬monitor_thread Ïß³Ì"
+        CmdPrint "¿ªÆô£¬monitor_thread Ïß³Ì"
         monitor_thread = BeginThread(game_monitor)     : Delay 1000
     End if
 
 
 Sub game_work
-	LogStart gamelogfile
-	TracePrint "game_work¿ªÊ¼ ssssssssssssssssssssssssssssssssssssssssss"
+	//LogStart gamelogfile
+	
+	CmdPrint "game_work¿ªÊ¼ ssssssssssssssssssssssssssssssssssssssssss"
     start_time = now
     importdmdll 
-    
+    dm.Moveto 1000, 549 : Delay 500 : dm.LeftClick
     logintime = BeginThread(count_to(160, "µÇÂ¼³¬Ê±"))//¿ªÊ¼ÓÎÏ·µÇÂ¼³¬Ê±¼ÆÊı
-    TracePrint logintime
+    CmdPrint logintime
     hsinitializemj
     hb_intogame
-    TracePrint "µÇÂ¼³¬Ê±160Ãë¹Ø±Õ " : StopThread logintime//ÓÎÏ·µÇÂ¼³É¹¦£¬Í£Ö¹³¬Ê±¼ÆÊı
+    CmdPrint "µÇÂ¼³¬Ê±160Ãë¹Ø±Õ " : StopThread logintime//ÓÎÏ·µÇÂ¼³É¹¦£¬Í£Ö¹³¬Ê±¼ÆÊı
     hb_hbstart
-    gamerun = 1 : TracePrint "ÓÎÏ·µÇÂ¼³É¹¦------"
+    gamerun = 1 : CmdPrint "ÓÎÏ·µÇÂ¼³É¹¦------"
     
 //    timeout_thread = BeginThread(count_to(2230,"¹ı¹Ø³¬Ê±")) //¿ªÊ¼ÓÎÏ·µÇÂ¼³¬Ê±¼ÆÊı
 //    gamewininit
 //    instartscreen 
 //    TracePrint "¹ı¹Ø³¬Ê±2230Ãë¹Ø±Õ " : StopThread timeout_thread //ÓÎÏ·µÇÂ¼³É¹¦£¬Í£Ö¹³¬Ê±¼ÆÊı
 	//TracePrint "¹ı¹Ø³¬Ê±2230Ãë¹Ø±Õ " : isout = 0 //ÓÎÏ·µÇÂ¼³É¹¦£¬Í£Ö¹³¬Ê±¼ÆÊı
-    TracePrint "game_workÓÃÊ±£º " & start_time & "--" & now
+    CmdPrint "game_workÓÃÊ±£º " & start_time & "--" & now
     
 End Sub
 
 Function count_to(second, note)
 	isout = 1
-	TracePrint "¿ªÆôÁË³¬Ê±Ïß³Ì£º" & note & "--" & second & "Ãë" & now
+	CmdPrint "¿ªÆôÁË³¬Ê±Ïß³Ì£º" & note & "--" & second & "Ãë" & now
 	Delay 1000*second
 	
 	//goto startover //³¬Ê±Ïß³ÌÔÚ¹æ¶¨µÄÊ±¼äÄÚÃ»ÓĞ±»É±ËÀ£¬ÔòÓÎÏ·ÖØĞÂ¿ªÊ¼
 
-	TracePrint "ÒÑ¾­³¬Ê±£º" & note & "--" & second & "Ãë reboot= " & reboot & now
+	CmdPrint "ÒÑ¾­³¬Ê±£º" & note & "--" & second & "Ãë reboot= " & reboot & now
 	RestartScript
 End Function
 
 Sub game_monitor
     importdmdll2 
-    LogStart monitorlogfile
+    //LogStart monitorlogfile
     Do
         If gamerun = 0 then // Èç¹ûÓÎÏ·»¹Ã»Æô¶¯£¬Ôò¶îÍâÑÓÊ± 120 Ãë
-            TracePrint "ÓÎÏ·»¹Ã»Æô¶¯£¬¶îÍâÑÓÊ± 120 Ãë£¬RestartScript--------------"
+            CmdPrint "ÓÎÏ·»¹Ã»Æô¶¯£¬¶îÍâÑÓÊ± 120 Ãë£¬RestartScript--------------"
             Delay 120000
         End If
         Delay 50000//50ÃëÑ­»·Ò»´Î
-        TracePrint "game_monitorÔËĞĞÖĞ... ... ...++++++++++++++++++++++++++++++++++++++++" & reboot
+        CmdPrint "game_monitorÔËĞĞÖĞ... ... ...++++++++++++++++++++++++++++++++++++++++" & reboot
         If reboot = 1 Then
-            TracePrint "²¶»ñµ½±äÁ¿Òì³££¬RestartScript--------------"
+            CmdPrint "²¶»ñµ½±äÁ¿Òì³££¬RestartScript--------------"
             RestartScript
             If work_thread <> 0 Then 
             	TracePrint "ÔÚmonitorÖĞÍ£Ö¹ work_thread Ïß³Ì£º" 
@@ -164,11 +165,11 @@ hbwin = 1
         	//RestartScript
         End If
         If hbwin = 0 Then 
-        	TracePrint "hb´°¿ÚÒì³££¬ÖØĞÂÔËĞĞ"
+        	CmdPrint "hb´°¿ÚÒì³££¬ÖØĞÂÔËĞĞ"
         	RestartScript
         End If
         If oopwin <> 0 OR  gamewin=0 Then
-            TracePrint "ÓÎÏ·´°¿ÚÒì³££¬startover--------------"
+            CmdPrint "ÓÎÏ·´°¿ÚÒì³££¬startover--------------"
             RestartScript
         End If
         
@@ -178,7 +179,7 @@ hbwin = 1
 		If hb_wnd > 0 Then 
 			hb_get_quest_st 5,g_username
 		Else 
-			TracePrint "heartbuddy not lunched"
+			CmdPrint "heartbuddy not lunched"
 		End If
 		
     Loop
@@ -2196,7 +2197,7 @@ hb_Fbeforegame
 game = hb_FhandleBattle()//»ñÈ¡ÓÎÏ·´°¿Ú¾ä±ú
 Delay 3000
 If game <> 0 Then 
-	TracePrint "ÓÎÏ·´°¿ÚÒÑ¾­ÔÚÔËĞĞÁË£¬"
+	CmdPrint "ÓÎÏ·´°¿ÚÒÑ¾­ÔÚÔËĞĞÁË£¬"
 	dm.SetWindowState game, 1
 	gamerun = 1
 End If
@@ -2229,7 +2230,7 @@ Function hb_Fgetaccount(id)
 	"zzw4tm_65361fia@163.com,aaaa2222")
 	
 	strarr = split(GetDataFromURL(id), ",",2)
-	TracePrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
+	CmdPrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
 	hb_Fgetaccount = strarr
 End Function
 /*****************************************************/
@@ -2366,9 +2367,9 @@ Function hb_Finputlogin()' ÊäÈëÕËºÅÃÜÂë£¬µÇÂ¼ÓÎÏ·
 		dm.SetClipboard username : Delay ss * 5 // ÓÃ»§Ãû·ÅÖÃµ½ÏµÍ³¼ôÇĞ°å
 		dm.RightClick  : Delay ss * 35
 		//dm.Moveto 139,260 : hb_LeftClick3 : Delay ss * 15
-		dm.Moveto 153,227 : dm.LeftClick : Delay ss * 15
-		//dm.KeyPress 80 : Delay ss * 5 // ÓÒ¼ü£¬°´P,¸´ÖÆ
-		TracePrint "ÓÒ¼üP¸´ÖÆÓÃ»§Ãû" : dm.SetWindowState login, 1
+		//dm.Moveto 153,227 : dm.LeftClick : Delay ss * 15
+		dm.KeyPress 80 : Delay ss * 5 // ÓÒ¼ü£¬°´P,¸´ÖÆ
+		CmdPrint "ÓÒ¼üP¸´ÖÆÓÃ»§Ãû" : dm.SetWindowState login, 1
 				
 		dm.KeyPress 9 : Delay ss * 5 // tab¼üÒÆ¶¯µ½ÃÜÂë£¬»ñÈ¡ÃÜÂë½¹µã
 		dm.Moveto 273, 210 : hb_LeftClick3  : Delay ss * 10 // ÒÆ¶¯µ½ÓÃ»§Ãû£¬µã»÷3´Î£¬»ñÈ¡ÓÃ»§Ãû½¹µã
@@ -2381,12 +2382,12 @@ Function hb_Finputlogin()' ÊäÈëÕËºÅÃÜÂë£¬µÇÂ¼ÓÎÏ·
 		Do
 			Delay ss * 10 : dm.SetWindowState login, 1
 			point = dm.GetResultCount(dm.FindColorEx(134,281,145,292, _
-        	 "0888c3-000000|0b90cd-000000", 0.9, 0)) : TracePrint "µÇÂ¼°´¼ü, ÕÒµ½µÄµãÊı: " & point
+        	 "0888c3-000000|0b90cd-000000", 0.9, 0)) : CmdPrint "µÇÂ¼°´¼ü, ÕÒµ½µÄµãÊı: " & point
         Loop Until point > 150
-        TracePrint "µÇÂ¼ °´¼ü³¬Ê±10Ãë¹Ø±Õ " : StopThread inputtime
+        CmdPrint "µÇÂ¼ °´¼ü³¬Ê±10Ãë¹Ø±Õ " : StopThread inputtime
         
 		dm.Moveto 103, 285 : hb_LeftClick3  : Delay ss * 10// µã»÷µÇÂ¼
-		TracePrint "ÓÃ»§ÕÊ»§ÊäÈëÍê³É"
+		CmdPrint "ÓÃ»§ÕÊ»§ÊäÈëÍê³É"
 			
 	End If
 End Function
@@ -2431,7 +2432,7 @@ Function hb_Ffindsec //Õ½Íø°²È«ÎÊÌâ»Ø´ğ ´°¿Ú
 		Delay 3000 : winsec2 = dm.FindWindow("", "Õ½ÍøÕËºÅ°²È«")
 		If winsec2 <> 0 Then 
 			hb_Fgetplayuser act, "122", "0"
-            TracePrint "Õ½ÍøÕËºÅ°²È«½âËøÊ§°Ü£¬ÉèÖÃÎª 122"
+            CmdPrint "Õ½ÍøÕËºÅ°²È«½âËøÊ§°Ü£¬ÉèÖÃÎª 122"
             EndScript
  			//RestartScript
 		End If
@@ -2478,7 +2479,7 @@ If nickname <> 0 Then ' ´¦Àí Õ½ÍøêÇ³Æ´´½¨ ´°¿Ú
 		Delay ss * 10 : dm.SetWindowState nickname, 1
 		dm.Moveto 77, 252 : dm.LeftClick  : Delay ss * 20' µã»÷ Ëæ»úÉú³É
 		point = dm.GetResultCount(dm.FindColorEx(56,410,72,423, _
-         "0889c5-000000|098ac7-000000", 0.9, 0)) : TracePrint "Õ½ÍøêÇ³Æ °´¼ü, ÕÒµ½µÄµãÊı: " & point
+         "0889c5-000000|098ac7-000000", 0.9, 0)) : CmdPrint "Õ½ÍøêÇ³Æ °´¼ü, ÕÒµ½µÄµãÊı: " & point
     Loop Until point > 150
 	//TracePrint "Õ½ÍøêÇ³Æ °´¼ü³¬Ê±30Ãë¹Ø±Õ " : isout = 0
     dm.Moveto 119, 423 : hb_LeftClick3  : Delay ss * 10 ' Íê³É
@@ -2608,7 +2609,7 @@ End Function
 Function hb_hbstart()
 	game_hwnd = dm.FindWindow("", title_game)
 	If game_hwnd = 0 Then 
-		TracePrint "ÓÎÏ·´°¿Ú²»´æÔÚ,ÇëÏÂ¿ªÆôÓÎÏ·"
+		CmdPrint "ÓÎÏ·´°¿Ú²»´æÔÚ,ÇëÏÈ¿ªÆôÓÎÏ·"
 		Exit Function
 	End If
 	dm.MoveWindow game_hwnd, 970, 680 : Delay ss * 10// ÓÎÏ·´°¿Úµ÷Õû
@@ -2616,23 +2617,23 @@ Function hb_hbstart()
 	Delay 4000
 	hkj = dm.FindWindow("", "Using Public auth server")
 	If hkj = 0 Then // Èç¹ûÃ»ÓĞ cdk ´°¿Ú£¬Ôò´ò¿ª
-		TracePrint "Èç¹ûÃ»ÓĞ cdk ´°¿Ú£¬Ôò´ò¿ª"
+		CmdPrint "Èç¹ûÃ»ÓĞ cdk ´°¿Ú£¬Ôò´ò¿ª"
     	hkjr = CreateObject("WScript.Shell").Run(hb_hkj) : Delay ss * 30
     	Do
     		Delay 1000
     		hhh = dm.FindWindow("", "Using Public auth server")
     	Loop Until hhh
     	
-    	TracePrint " cdk ´°¿Ú£¬´ò¿ª"&hhh
+    	CmdPrint " cdk ´°¿Ú£¬´ò¿ª"&hhh
 		dm.MoveWindow hhh, g_hswindow_x, g_hswindow_y : Delay ss * 10 // cdk´°¿Úµ÷Õû
 		dm.SetWindowState hhh, 1 : dm.Moveto 285, 61 : dm.LeftClick  : Delay ss * 10 : dm.LeftClick // cdk´°¿Úµã»÷
 		dm.MoveWindow hhh, 1010, - 50  : Delay ss * 10// cdk´°¿Úµ÷Õû
-		TracePrint " cdk ´°¿Ú£¬´ò¿ª"
+		CmdPrint " cdk ´°¿Ú£¬´ò¿ª"
 		//dm.SetWindowState hkj, 2 '×îĞ¡»¯ cdk ´°¿Ú
 	End If
 	
 	
-	TracePrint "¿ªÆôhb          -----"
+	CmdPrint "¿ªÆôhb          -----"
 	hb = dm.FindWindow("", title_hb)
 	If hb = 0 Then  //Èç¹ûhb´°¿Ú²»´æÔÚ£¬Ôò´ò¿ª hb
 		hbr = CreateObject("WScript.Shell").Run(hb_wg) : Delay ss * 10
@@ -2655,7 +2656,6 @@ Function hb_hbstart()
 	dm.MoveWindow hb, g_hswindow_x, g_hswindow_y : Delay ss * 20'ÓÎÏ·´°¿Úµ÷Õû
 	
 	//dm.Moveto 240, 98 : Delay ss * 300 : dm.LeftClick 
-	TracePrint "click start "
 	
 End Function
 
@@ -2665,15 +2665,15 @@ Sub hb_set_profile(name,hwnd)
 	dm.MoveWindow hwnd, g_hswindow_x, g_hswindow_y : Delay ss * 20'ÓÎÏ·´°¿Úµ÷Õû
 	
 	profile = split(name, "@")
-	TracePrint "profile ="&profile(0)
+	CmdPrint "profile ="&profile(0)
 	dm.SetClipboard profile(0) : Delay ss * 5// ÓÃ»§Ãû·ÅÖÃµ½ÏµÍ³¼ôÇĞ°å
 	dm.Moveto 22, 44 : Delay ss * 10		
 	dm.LeftClick : Delay ss * 10
 	dm.RightClick  : Delay ss * 30
-    //dm.Moveto 82,68 : dm.LeftClick : Delay ss * 5 
-    dm.Moveto 74,87 : hb_LeftClick3 : Delay ss * 5 
-    //dm.KeyPress 80 : Delay ss * 5 // ÓÒ¼ü£¬°´P,¸´ÖÆ
-	TracePrint "ÓÒ¼ü paste profile_name" 
+
+    //dm.Moveto 74,87 : hb_LeftClick3 : Delay ss * 5 
+    dm.KeyPress 80 : Delay ss * 5 // ÓÒ¼ü£¬°´P,¸´ÖÆ
+	CmdPrint "ÓÒ¼ü paste profile_name" 
 	
 	dm.SetWindowState hwnd, 1 : Delay ss * 10 : dm.KeyPress 13 //¼¤»î hbcnf ´°¿Ú,²¢»Ø³µ
 	
@@ -2687,12 +2687,12 @@ Sub hb_get_quest_st(num,user)
 	profile = split(user, "@")
 	path = "D:\wg\hb_new\Hearthbuddy 0.3.828.115\Settings\"&profile(0)&"\Stats.json"
 
-	TracePrint "profile ="&path
+	CmdPrint "profile ="&path
 	Isfile = Plugin.File.IsFileExist(path)
 	
 	
 	If Isfile =0 Then
-		TracePrint "Stats.json no found " & path
+		CmdPrint "Stats.json no found " & path
 		Exit Sub
 	End If
 	
@@ -2700,7 +2700,7 @@ Sub hb_get_quest_st(num,user)
 	fileHandle = Plugin.File.OpenFile(path)
 	
 	If fileHandle > -1  Then 
-		TracePrint "fileHandle" & fileHandle
+		CmdPrint "fileHandle" & fileHandle
 		
 		Do While linenum < 10
 		
@@ -2748,7 +2748,7 @@ Sub hb_get_quest_st(num,user)
 		qt = CInt(qt_num(0))
 	End If
 	
-	TracePrint "ÀÛ¼ÆÊ¤Àû/Ê§°Ü³¡´Î***£º" & win & "/" & loss & "ÈÎÎñÊı" & qt
+	CmdPrint "ÀÛ¼ÆÊ¤Àû/Ê§°Ü³¡´Î***£º" & win & "/" & loss & "ÈÎÎñÊı" & qt
 	
 	If Len(dwins)>0 Then
 		dwins_str = split(dwins, ":")
@@ -2761,16 +2761,16 @@ Sub hb_get_quest_st(num,user)
 		dloss = CInt(dlosses_str(1))
 	End If
 	
-	TracePrint "µ±ÌìÊ¤Àû/Ê§°Ü³¡´Î***£º" & dwin & "/" & dloss & "ÈÎÎñÊı" & qt
+	CmdPrint "µ±ÌìÊ¤Àû/Ê§°Ü³¡´Î***£º" & dwin & "/" & dloss & "ÈÎÎñÊı" & qt
 
 	If Len(newtime)>0 Then
 		newtime_str = split(newtime, ":")
 		newtime_num = split(newtime_str(1), ",")
 		lasttime = Trim(newtime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
-        TracePrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "¾àÀëÉÏ´ÎnewgameÊ±¼ä " & UnixTime - lasttime
+        CmdPrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "¾àÀëÉÏ´ÎnewgameÊ±¼ä " & UnixTime - lasttime
 		If lasttime<>0 And (UnixTime - lasttime) > 1200 Then 
-			TracePrint "¾àÀëÉÏ´ÎnewgameÊ±¼ä³¬¹ı20·ÖÖÓ£¬ÖØĞÂÆô¶¯"
+			CmdPrint "¾àÀëÉÏ´ÎnewgameÊ±¼ä³¬¹ı20·ÖÖÓ£¬ÖØĞÂÆô¶¯"
 			RestartScript
 		End If
 	End If
@@ -2779,9 +2779,9 @@ Sub hb_get_quest_st(num,user)
 		ticktime_num = split(ticktime_str(1), ",")
 		tktime = Trim(ticktime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
-        TracePrint "ticktimeÊ±¼ä " & UnixTime - tktime
+        CmdPrint "ticktimeÊ±¼ä " & UnixTime - tktime
 		If tktime<>0 And UnixTime - tktime > 140 Then
-			TracePrint "ticktimeÊ±¼ä³¬¹ı2·ÖÖÓ£¬ÖØĞÂÆô¶¯"
+			CmdPrint "ticktimeÊ±¼ä³¬¹ı2·ÖÖÓ£¬ÖØĞÂÆô¶¯"
 			RestartScript
 		End If
 	End If				
@@ -2792,7 +2792,7 @@ Sub hb_get_quest_st(num,user)
 //	End If
 	If qt = condition_1 and dwin >= condition_2  Then 
 		hb_Fgetplayuser "play", "82", "0"// »»ºÅ
-		TracePrint "»»ºÅÌõ¼şÂú×ã£¬ÖØĞÂ¿ªÊ¼ "
+		CmdPrint "»»ºÅÌõ¼şÂú×ã£¬ÖØĞÂ¿ªÊ¼ "
 		RestartScript  // ÖØĞÂ¿ªÊ¼
 	End If
 
@@ -2810,28 +2810,28 @@ End Sub
 Function hb_Fgetuser(act, st, glod)
 	Set objHTTP = CreateObject("WinHttp.WinHttpRequest.5.1" )
 	//objHTTP.Open "POST", "http://172.21.12.59/hb/test.php", False
-	objHTTP.Open "POST", "http://hk.kkapks.com/hb/test.php", False
+	objHTTP.Open "POST", "http://172.21.12.59/hb/test.php", False
 	objHTTP.SetRequestHeader "Content-Type", "application/x-www-form-urlencoded"
  
 	result = objHTTP.Send("act=" & "unlock" & "&st=" & st & "&glod=" & glod & "&localip=" & getIp)
 	GetDataFromURL = objHTTP.ResponseText
 	//TracePrint GetDataFromURL
 	strarr = split(GetDataFromURL, ",",2)
-	TracePrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
+	CmdPrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
 	hb_Fgetuser = strarr
 End Function
 
 Function hb_Fgetplayuser(act, st, glod)
 	Set objHTTP = CreateObject("WinHttp.WinHttpRequest.5.1" )
 	//objHTTP.Open "POST", "http://172.21.12.59/hb/test.php", False
-	objHTTP.Open "POST", "http://hk.kkapks.com/hb/play.php", False
+	objHTTP.Open "POST", "http://172.21.12.59/hb/play.php", False
 	objHTTP.SetRequestHeader "Content-Type", "application/x-www-form-urlencoded"
  
 	result = objHTTP.Send("act=" & act & "&st=" & st & "&glod=" & glod & "&localip=" & getIp)
 	GetDataFromURL = objHTTP.ResponseText
 	//TracePrint GetDataFromURL
 	strarr = split(GetDataFromURL, ",",2)
-	TracePrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
+	CmdPrint " ÓÃ»§Ãû: " & strarr(0) & "   £» ÃÜÂë: " & strarr(1)
 	hb_Fgetplayuser = strarr
 End Function
 
@@ -2896,12 +2896,12 @@ Function pic_normal() // ½âËøÍê³ÉµÄÕË»§£¬µÇÂ¼ºóµÄÕı³£½çÃæ£¬»ÆÉ«¸ĞÌ¾ºÅ,Ã»ÓĞ´°¿Ú·µ
 	
 	//If point > 50 and point2 > 40 Then 
 	If point > 150 Then 
-		TracePrint " --- »­Ãæ: Õı³£ ½ğÉ« £¡ £¬ÕÒµ½µÄµã:  " & point & "," & point2
+		CmdPrint " --- »­Ãæ: Õı³£ ½ğÉ« £¡ £¬ÕÒµ½µÄµã:  " & point & "," & point2
 		pic_normal = 1
 		Exit Function
 	End If
 	pic_normal = 0
-	TracePrint " ---»­Ãæ: Õı³£ ½ğÉ« £¡ Ã»ÕÒµ½"
+	CmdPrint " ---»­Ãæ: Õı³£ ½ğÉ« £¡ Ã»ÕÒµ½"
 End Function
 
 
@@ -2925,14 +2925,14 @@ Function pic_dijing() // ½âËøÍê³ÉµÄÕË»§£¬µØ¾«´óÕ½ÙªÈå,Ã»ÓĞ´°¿Ú·µ»Ø 88£¬ÕÒµ½»­Ãæ·
 	point2 = dm.GetResultCount(dm.FindColorEx(125,233,131,244, _
          "ffd794-000000|f7cf8c-000000|ffd38c-000000", 0.9, 0))
     
-    TracePrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå £¬ÕÒµ½µÄµã:  " & point & "," & point2
+    CmdPrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå £¬ÕÒµ½µÄµã:  " & point & "," & point2
 	If point > 50 and point2 > 40 Then 
-		TracePrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå £¬ÕÒµ½µÄµã:  " & point & "," & point2
+		CmdPrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå £¬ÕÒµ½µÄµã:  " & point & "," & point2
 		pic_dijing = 1
 		Exit Function
 	End If
 	pic_dijing = 0
-	TracePrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå Ã»ÕÒµ½"
+	CmdPrint " --- »­Ãæ: µØ¾«´óÕ½ÙªÈå Ã»ÕÒµ½"
 End Function
 
 
@@ -2960,24 +2960,24 @@ Function pic_close()//  ¹Ø±Õ»­Ãæ¡°¾àÀëÉÏÒ»´Î²Ù×÷ÒÑ¾­¹ıÁËºÜ³¤Ê±¼ä£¬ÓÎÏ·ÖĞ¶Ï¡±,Ã»Ó
          "c65918-000000|bd5918-000000|bd5910-000000", 0.9, 0))
 	
 	If point > 40 and point2 > 60 Then 
-		TracePrint " --- »­Ãæ: Òì³£ ¹Ø±Õ £¬ÕÒµ½µÄµã:  " & point & "," & point2
+		CmdPrint " --- »­Ãæ: Òì³£ ¹Ø±Õ £¬ÕÒµ½µÄµã:  " & point & "," & point2
 		pic_close = 1
 		Exit Function
 	End If
 	pic_close = 0
-	TracePrint " ---»­Ãæ: Òì³£ ¹Ø±Õ Ã»ÕÒµ½"
+	CmdPrint " ---»­Ãæ: Òì³£ ¹Ø±Õ Ã»ÕÒµ½"
 	
 End Function
 
 Sub setsystime
 	Set objHTTP = CreateObject("WinHttp.WinHttpRequest.5.1" )
-	objHTTP.Open "PUT", "http://hk.kkapks.com/hb/time.php", False
+	objHTTP.Open "PUT", "http://172.21.12.59/hb/time.php", False
 	objHTTP.SetRequestHeader "Content-Type", "application/x-www-form-urlencoded"
 	result = objHTTP.Send()
 	GetDataFromURL = objHTTP.ResponseText
 	//TracePrint GetDataFromURL
 	strarr = split(GetDataFromURL, ",",2)
-	TracePrint "ÈÕÆÚ: " & strarr(0) & "   £» Ê±¼ä: " & strarr(1)
+	CmdPrint "ÈÕÆÚ: " & strarr(0) & "   £» Ê±¼ä: " & strarr(1)
 	Dim WshShell
 	Set WshShell = CreateObject("wscript.Shell")
 	WshShell.Run "cmd.exe /c date " + strarr(0), 0
@@ -3000,16 +3000,22 @@ Function pic_maintain()//  Î¬»¤ÌáĞÑ
 
 	point = dm.GetResultCount(dm.FindColorEx(31,34,43,43, _
          "ffd700-000000|f7cb00-000000", 0.9, 0))
-	TracePrint " --- »­Ãæ: Î¬»¤ÌáĞÑ £¬ÕÒµ½µÄµã:  " & point 
+	CmdPrint " --- »­Ãæ: Î¬»¤ÌáĞÑ £¬ÕÒµ½µÄµã:  " & point 
 	If point > 60 Then 
-		TracePrint " --- »­Ãæ: Î¬»¤ÌáĞÑ £¬ÕÒµ½µÄµã:  " & point
-		TracePrint " ---Î¬»¤ÌáĞÑ £¬ÒÆ¶¯µÇÂ¼´°¿Ú£¬¼ÌĞøµÇÂ¼"
+		CmdPrint " --- »­Ãæ: Î¬»¤ÌáĞÑ £¬ÕÒµ½µÄµã:  " & point
+		CmdPrint " ---Î¬»¤ÌáĞÑ £¬ÒÆ¶¯µÇÂ¼´°¿Ú£¬¼ÌĞøµÇÂ¼"
 		dm.MoveWindow win, g_hswindow_x-362, g_hswindow_y : Delay ss * 5 //ÓÎÏ·µÇÂ¼µ÷Õû
 		pic_maintain = 1
 		Exit Function
 	End If
 	pic_maintain = 0
-	TracePrint " ---»­Ãæ: Î¬»¤ÌáĞÑ Ã»ÕÒµ½£¬¼ÌĞøµÇÂ¼"
+	CmdPrint " ---»­Ãæ: Î¬»¤ÌáĞÑ Ã»ÕÒµ½£¬¼ÌĞøµÇÂ¼"
 	
 End Function
 
+Function CmdPrint(str)//  Î¬»¤ÌáĞÑ
+	TracePrint str
+	Dim WshShell
+	Set WshShell = CreateObject("wscript.Shell")
+	WshShell.Run "cmd.exe /c echo " + str + ">>" + monitorlogfile, 0
+End Function
