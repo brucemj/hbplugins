@@ -98,7 +98,7 @@ Sub game_work
     importdmdll 
     dm.Moveto 1000, 549 : Delay 500 : dm.LeftClick
     logintime = BeginThread(count_to(160, "登录超时"))//开始游戏登录超时计数
-    CmdPrint logintime
+    //CmdPrint logintime
     hsinitializemj
     hb_intogame
     CmdPrint "登录超时160秒关闭 " : StopThread logintime//游戏登录成功，停止超时计数
@@ -2798,8 +2798,8 @@ Sub hb_get_quest_st(num,user)
 		lasttime = Trim(newtime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
         CmdPrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "距离上次newgame时间 " & UnixTime - lasttime
-		If lasttime<>0 And (UnixTime - lasttime) > 1200 Then 
-			CmdPrint "距离上次newgame时间超过20分钟，重新启动"
+		If lasttime<>0 And (UnixTime - lasttime) > 1400 Then 
+			CmdPrint "距离上次newgame时间超过23分钟，重新启动"
 			RestartScript
 		End If
 	End If
@@ -3046,5 +3046,5 @@ Function CmdPrint(str)//  维护提醒
 	TracePrint str
 	Dim WshShell
 	Set WshShell = CreateObject("wscript.Shell")
-	WshShell.Run "cmd.exe /c echo " + str + ">>" + monitorlogfile, 0
+	WshShell.Run "cmd.exe /c echo " + chr(34) + str + chr(34) + ">>" + monitorlogfile, 0
 End Function
