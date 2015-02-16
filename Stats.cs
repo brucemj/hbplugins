@@ -303,13 +303,17 @@ namespace Stats
                 if( !_isUnlocking ){
 					StatsSettings.Instance.Wins++;
 					StatsSettings.Instance.DWins++;
+					
+				}
+				if(_isUnlocking){
+					var decks = TritonHs.BasicHeroTagClasses;
+                	// //Choose a random deck. We can add more logic for selection later...
+                	var deck = decks[Client.Random.Next(0, decks.Length)];
+                	NormalPlayConf(deck);
 				}
 				_isUnlocking = false;
                 
-                var decks = TritonHs.BasicHeroTagClasses;
-                // //Choose a random deck. We can add more logic for selection later...
-                var deck = decks[Client.Random.Next(0, decks.Length)];
-                NormalPlayConf(deck);
+                
             
                 UpdateMainGuiStats();
             }
@@ -405,12 +409,16 @@ namespace Stats
                 }
                 else
                 {
-                    rightControl.Content = string.Format("{0} / {1} ({2:0.00} %) [{3} concedes]",
+                    rightControl.Content = string.Format("{0} / {1} ({2:0.00} %) [{3} concedes] [{4}/{5}-{6}]",
                         StatsSettings.Instance.Wins,
                         StatsSettings.Instance.Wins + StatsSettings.Instance.Losses,
                         100.0f*(float) StatsSettings.Instance.Wins/
                         (float) (StatsSettings.Instance.Wins + StatsSettings.Instance.Losses),
-                        StatsSettings.Instance.Concedes);
+                        StatsSettings.Instance.Concedes,
+                        StatsSettings.Instance.DWins,
+                        StatsSettings.Instance.DWins + StatsSettings.Instance.DLosses,
+                        StatsSettings.Instance.Quests
+                        );
 
                     Log.InfoFormat("[Stats] Summary: {0}", rightControl.Content);
                 }

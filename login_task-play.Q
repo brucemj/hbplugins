@@ -2822,7 +2822,13 @@ Sub hb_get_quest_st(num,user)
 //	End If
 	If qt = condition_1 and dwin >= condition_2  Then 
 		hb_Fgetplayuser "play", "82", "0"// 换号
-		CmdPrint "换号条件满足，重新开始 "
+		CmdPrint "换号条件满足 6+0，重新开始 "
+		RestartScript  // 重新开始
+	End If
+    
+    If dwin >= 7  Then 
+		hb_Fgetplayuser "play", "82", "0"// 换号
+		CmdPrint "换号条件满足 7+?，重新开始 "
 		RestartScript  // 重新开始
 	End If
 
