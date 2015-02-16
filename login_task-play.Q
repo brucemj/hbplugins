@@ -126,6 +126,7 @@ Sub checkfreezewin(hwnd)
 			TracePrint "checkfreezewin 窗口未响应"
 			i=i+1
 			If i = 30 Then //如果窗口未响应30次，
+                CmdPrint "窗口未响应30次"
 				RestartScript
 			End If
 		End If
@@ -2798,8 +2799,8 @@ Sub hb_get_quest_st(num,user)
 		lasttime = Trim(newtime_num(0))
 		UnixTime = DateDiff("s", "01/01/1970 08:00:00", Now())
         CmdPrint "UnixTime=" & UnixTime & "-" & "lasttime=" & lasttime & "距离上次newgame时间 " & UnixTime - lasttime
-		If lasttime<>0 And (UnixTime - lasttime) > 1400 Then 
-			CmdPrint "距离上次newgame时间超过23分钟，重新启动"
+		If lasttime<>0 And (UnixTime - lasttime) > 1500 Then 
+			CmdPrint "距离上次newgame时间超过25分钟，重新启动"
 			RestartScript
 		End If
 	End If
