@@ -28,6 +28,7 @@ namespace Stats
 		private bool _tickstop = false;
         
         private Triton.Game.Mapping.TAG_CLASS unlockDeck = TritonHs.BasicHeroTagClasses[1];
+        //private Triton.Game.Mapping.TAG_CLASS taskDeck = TritonHs.BasicHeroTagClasses[1];
         private bool _isUnlocking = false;
         private int _numHung = 0;
 
@@ -77,6 +78,7 @@ namespace Stats
             GameEventManager.GameOver += GameEventManagerOnGameOver;
 			GameEventManager.NewGame += GameEventManagerOnNewGame ;
 			_tickstop = false ;
+            NormalPlayConf();
         }
 		
 		public void GameEventManagerOnNewGame(object sender, NewGameEventArgs newGameEventArgs)
@@ -234,11 +236,7 @@ namespace Stats
             _enabled = true;
             
             Log.DebugFormat("Hello this is custom Stats! --------");
-            
-            var decks = TritonHs.BasicHeroTagClasses;
-            // //Choose a random deck. We can add more logic for selection later...
-            var deck = decks[Client.Random.Next(0, decks.Length)];
-            NormalPlayConf(deck);
+            NormalPlayConf();
             //UpdateMainGuiStats();
 			
 			DateTime dtDateTime = Convert.ToDateTime("1970-1-1 00:00:00");
@@ -305,16 +303,9 @@ namespace Stats
 					StatsSettings.Instance.DWins++;
 					
 				}
-				if(_isUnlocking){
-					var decks = TritonHs.BasicHeroTagClasses;
-                	// //Choose a random deck. We can add more logic for selection later...
-                	var deck = decks[Client.Random.Next(0, decks.Length)];
-                	NormalPlayConf(deck);
-				}
+               	NormalPlayConf();
 				_isUnlocking = false;
-                
-                
-            
+
                 UpdateMainGuiStats();
             }
             else if (gameOverEventArgs.Result == GameOverFlag.Defeat)
@@ -328,6 +319,7 @@ namespace Stats
                     if(!_isUnlocking){
 						StatsSettings.Instance.Losses++;
 						StatsSettings.Instance.DLosses++;
+                        NormalPlayConf();
 					}
                 }
                 UpdateMainGuiStats();
@@ -409,7 +401,7 @@ namespace Stats
                 }
                 else
                 {
-                    rightControl.Content = string.Format("{0} / {1} ({2:0.00} %) [{3} concedes] [{4}/{5}-{6}]",
+                    rightControl.Content = string.Format("{0} / {1} ({2:0.00} %) [{3} concedes] [{4}/{5}-{6}]v1",
                         StatsSettings.Instance.Wins,
                         StatsSettings.Instance.Wins + StatsSettings.Instance.Losses,
                         100.0f*(float) StatsSettings.Instance.Wins/
@@ -497,7 +489,9 @@ namespace Stats
 									"[Quest] Now choosing the basic hero class to complete 要求职业的任务： [{0}] ,任务ID: [{1}] with.",
 									quest.Name, quest.Id);
 
-                                NormalPlayConf(@class); ;
+                                //NormalPlayConf(@class);
+                                unlockDeck = @class ;
+                                NormalPlayConf();
 
 								foundQuest = true;
                                 _findNewQuest = false;
@@ -524,10 +518,10 @@ namespace Stats
 
                         Log.DebugFormat("[Quest] 预留功能，开发卡牌组,不要求职业的任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
                         
-                        NormalPlayConf(deck);
+                        unlockDeck = deck; //TritonHs.BasicHeroTagClasses[1];
                         // DefaultBotSettings.Instance.ConstructedDeckType = DeckType.Basic;
                         // DefaultBotSettings.Instance.ConstructedBasicDeck = deck;
-                        
+                        NormalPlayConf();
                         foundQuest = true;
                         _findNewQuest = false;
                         break;
@@ -537,7 +531,8 @@ namespace Stats
                     // //Choose a random deck. We can add more logic for selection later...
                     var pdeck = pdecks[Client.Random.Next(0, pdecks.Length)];
                     Log.DebugFormat("[Quest] 特殊任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
-                    NormalPlayConf(pdeck);
+                    unlockDeck = pdeck;   //TritonHs.BasicHeroTagClasses[1];
+                    NormalPlayConf();
                     _findNewQuest = false;
                     break;
                 }
@@ -550,7 +545,7 @@ namespace Stats
             _findNewQuest = true;
         }
     
-        private void NormalPlayConf(Triton.Game.Mapping.TAG_CLASS hero)
+        private void NormalPlayConf()
         {
             Log.DebugFormat("Use NormalPlayConf ......");
             DefaultBotSettings.Instance.GameMode = GameMode.Constructed	;
@@ -564,7 +559,46 @@ namespace Stats
             //var rngDeck = TritonHs.BasicHeroTagClasses[2];
             // 0-DRUID; 1-HUNTER; 2-MAGE; 3-PALADIN; 4-PRIEST;
             // 5-ROGUE; 6-SHAMAN; 7-WARLOCK; 8-WARRIOR;
-            unlockDeck = hero ;
+            
+            var foundQuest = false;
+            var quests = TritonHs.CurrentQuests;
+			StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
+            
+            //var deck1Array = new Triton.Game.Mapping.TAG_CLASS[2] ;
+            //var deck2Array = new Triton.Game.Mapping.TAG_CLASS[2] ;
+            foreach (var quest in quests)
+            {
+                if( quest.Id == 31 ){  // 【步步高升: 将任意职业提升至10级。】 跳过该任务
+                    StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count - 1 ;
+                }
+                Log.DebugFormat("[PlayConf] 任务： [{0}] ,任务ID: [{1}]", quest.Name, quest.Id);
+                // Loop through for each each class.
+
+                foreach (var @class in TritonHs.BasicHeroTagClasses)
+                {
+                    // If this is a class specific quest, find a suitable deck. Otherwise,
+                    // just use a random custom deck.
+                    if (TritonHs.IsQuestForSpecificClass(quest.Id))
+                    {
+                        // If this quest is a win quest for this class.
+                        if (TritonHs.IsQuestForClass(quest.Id, @class))
+                        {
+                            Log.DebugFormat(
+                                "[PlayConf] Now choosing the basic hero class to complete 要求职业的任务： [{0}] ,任务ID: [{1}] with.",
+                                quest.Name, quest.Id);
+    
+                            unlockDeck = @class ;
+    
+                            foundQuest = true;
+                            break;
+                        }
+                    }
+                }
+                if (foundQuest){
+                    break;
+                }
+            }
+            //unlockDeck = hero ;         
             DefaultBotSettings.Instance.ConstructedBasicDeck = unlockDeck;
             //StatsSettings.Instance.Quests = TritonHs.CurrentQuests.Count ;
             //StatsSettings.Instance.Quests = 3 ;
@@ -592,5 +626,6 @@ namespace Stats
             DefaultBotSettings.Instance.PracticeOpponentClass = unlockDeck;
         }
     }
+    
 }
 
